@@ -27,6 +27,7 @@ Machine Overview
 
 
 ### **1\. Reconnaissance**
+================================
 
 The first step is always reconnaissance. I started with a full Nmap scan to map out the attack surface:
 
@@ -71,6 +72,7 @@ To understand the backend logic, I used jadx-gui to decompile the retrieved JAR 
 
 
 ### **2\. Vulnerability Research & Intelligence**
+==================================================
 
 After identifying the tech stack through static analysis of the employee-service.jar, I shifted my focus to finding a viable entry point. Running an outdated stack like **Jetty 9.4.27** combined with **Apache CXF** is a massive red flag in any security audit.
 
@@ -93,6 +95,7 @@ To weaponize this, I utilized a specialized Python exploit script:
     
 
 ### **3\. Exploitation: Weaponizing the XXE**
+================================================
 
 I used the identified PoC to confirm the **XXE-to-SSRF** flaw. My primary objective was to confirm the vulnerability and map out the system users to find a path for lateral movement.
 
@@ -110,7 +113,7 @@ EXFILTRATED CONTENT  ===========================================================
 ``` 
 
 ### **4\. Pivoting: From XXE to Hoverfly Credentials**
-
+========================================================
 With the **XXE** vulnerability confirmed, my next objective was to find administrative credentials for the **Hoverfly Dashboard** running on port **8888**. In a real-world scenario, once you have **Arbitrary File Read**, you don't just guess files—you look for **Service Configurations** to find hardcoded secrets.
 
 ### **Why Target /etc/systemd/system/hoverfly.service?**
@@ -152,6 +155,7 @@ nano ~/Desktop ❯ python3 CVE-2022-46364.py \\         -t  \\    -s file:///etc
     
 
 ### **5\. Vulnerability Research: Hoverfly RCE**
+=================================================
 
 Having secured the credentials, I researched potential vulnerabilities for the Hoverfly instance. My investigation led to **CVE-2025-54123**, a critical **Command Injection** flaw.
 
@@ -169,6 +173,7 @@ Having secured the credentials, I researched potential vulnerabilities for the H
 **The Strategy**: Use the discovered admin:O7IJ27MyyXiU credentials to authenticate and exploit the middleware API to trigger a reverse shell as the dev\_ryan user.
 
 ### **6\. Initial Access: Hoverfly RCE**
+=========================================
 
 With the administrative credentials admin:O7IJ27MyyXiU in hand, I moved to exploit the **Hoverfly Middleware Command Injection** vulnerability. As identified in the research phase, this flaw allows for direct command execution through the middleware API.
 
@@ -230,6 +235,7 @@ CTRL Z
   ```
 
 ### **7\. Privilege Escalation**
+=================================
 
 After securing a foothold as **dev\_ryan**, I began my internal enumeration. Checking sudo permissions revealed an interesting entry:
 ```
@@ -298,7 +304,7 @@ The payload successfully set the SUID bit on Python 3. I could now use Python to
 
 
 ## **OWned the machine**
-=================
+==========================
 
 ### **Flags**
 
@@ -325,7 +331,7 @@ The payload successfully set the SUID bit on Python 3. I could now use Python to
 *   **Full System Compromise**: Executed a privileged script via sudo to trigger the payload and spawned a root shell using the modified Python binary.
 
 ## ** اللهم صل على محمد عبدك ورسولك كما صليت على إبراهيم ، وبارك على محمد وعلى آل محمد كما باركت على إبراهيم وعلى آل إبراهيم**
-===============================
+=================================================
 
 
 
