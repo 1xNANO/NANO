@@ -74,7 +74,7 @@ export const profileConfig: ProfileConfig = {
 		{
 			name: "Linkedin",
 			icon: "skill-icons:linkedin",
-			url: "https://www.linkedin.com/in/bassem-tarek-682450364/",
+			url: "https://www.linkedin.com/in/bassem-tarek-100187400/",
 		},
 		{
 			name: "Facebook",
@@ -85,7 +85,7 @@ export const profileConfig: ProfileConfig = {
 		{
 			name: "GitHub",
 			icon: "fa6-brands:github",
-			url: "https://github.com/NANObyte0",
+			url: "https://github.com/1xNANO",
 		},
 	],
 };
