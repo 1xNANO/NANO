@@ -287,7 +287,7 @@ The payload successfully set the SUID bit on Python 3. I could now use Python to
 ```
   python3 -c 'import os; os.setuid(0); os.system("/bin/sh")'   
 ```
-![captionless image](./page8.png)
+![captionless image](./page7.png)
 
 
 ## **OWned the machine**
@@ -316,5 +316,5 @@ The payload successfully set the SUID bit on Python 3. I could now use Python to
 *   **Privilege Escalation via Binary Hijacking**: Discovered that /usr/bin/bash was mistakenly set to **world-writable**. I replaced the system bash with a malicious payload that granted **SUID** permissions to Python3.
     
 *   **Full System Compromise**: Executed a privileged script via sudo to trigger the payload and spawned a root shell using the modified Python binary.
-![captionless image](./page7.png)
+![captionless image](./page9.gif)
 
