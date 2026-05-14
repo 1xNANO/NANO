@@ -4,7 +4,7 @@ published: 2026-05-13
 description: "⭐ NANO IS HERE ⭐"
 image: "./dev.png"
 tags: [PrivilegeEscalation,Penetration Testing, Red Team, Vulnerability Exploitation, Web Security]
-category: "Hacking TTPs, CTF"
+category: "CTF"
 draft: false
 
 ---
