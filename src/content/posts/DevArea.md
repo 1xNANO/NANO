@@ -1,10 +1,10 @@
 ---
-title: "System Takeover: DevArea HTB Writeup"
+title: "DevArea HTB Writeup"
 published: 2026-05-13
 description: "⭐ NANO IS HERE ⭐"
 image: "./dev.png"
 tags: [PrivilegeEscalation,Penetration Testing, Red Team, Vulnerability Exploitation, Web Security]
-category: "Hacking TTPs"
+category: "Hacking TTPs, CTF"
 draft: false
 
 ---
@@ -17,7 +17,14 @@ I’m **NANO**, and in this write-up, I’ll walk you through exploiting **DevAr
  - Full walkthrough of DevArea machine involving XXE, Hoverfly RCE, and Bash hijacking."
 ### **Step By Step**
 
-Let’s dive in and have some fun hacking.
+**Come with me to travel**
+
+Machine Overview
+
+    Name: DevArea
+    OS: Linux (Ubuntu 24.04)
+    Difficulty: Medium
+
 
 ### **1\. Reconnaissance**
 
@@ -52,7 +59,7 @@ Since **Anonymous login** was permitted, I immediately jumped into the FTP serve
 
 To understand the backend logic, I used jadx-gui to decompile the retrieved JAR file. Inside ServerStarter.java, I identified the use of **Apache CXF JAX-WS**.
 
-![captionless image](./page6.png)
+
 
 ```
 
@@ -316,5 +323,11 @@ The payload successfully set the SUID bit on Python 3. I could now use Python to
 *   **Privilege Escalation via Binary Hijacking**: Discovered that /usr/bin/bash was mistakenly set to **world-writable**. I replaced the system bash with a malicious payload that granted **SUID** permissions to Python3.
     
 *   **Full System Compromise**: Executed a privileged script via sudo to trigger the payload and spawned a root shell using the modified Python binary.
+
+## ** اللهم صل على محمد عبدك ورسولك كما صليت على إبراهيم ، وبارك على محمد وعلى آل محمد كما باركت على إبراهيم وعلى آل إبراهيم**
+===============================
+
+
+
 ![captionless image](./page9.gif)
 
