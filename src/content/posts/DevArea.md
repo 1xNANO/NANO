@@ -4,7 +4,7 @@ published: 2026-05-13
 description: "⭐ NANO IS HERE ⭐"
 image: "./dev.png"
 tags: [PrivilegeEscalation,Penetration Testing, Red Team, Vulnerability Exploitation, Web Security]
-category: Hacking TTPs,CTF
+category: CTF
 draft: false
 
 ---
@@ -13,7 +13,7 @@ draft: false
 **Introduction**
 ================
 
-HEllo honey **NANO**, and in this write-up, I’ll walk you through exploiting **DevArea**, a Medium Linux machine on HackTheBox. This challenge is a perfect showcase of how outdated services and small misconfigurations can lead to a full system compromise. We’ll start by exploiting an **XXE** vulnerability in an old SOAP service, move to **Remote Code Execution (RCE)** in Hoverfly, and finally seize **Root** access by abusing a world-writable bash binary
+**HEllo honey:)**  this write-up, I’ll walk you through exploiting **DevArea**, a Medium Linux machine on HackTheBox. This challenge is a perfect showcase of how outdated services and small misconfigurations can lead to a full system compromise. We’ll start by exploiting an **XXE** vulnerability in an old SOAP service, move to **Remote Code Execution (RCE)** in Hoverfly, and finally seize **Root** access by abusing a world-writable bash binary
  - Full walkthrough of DevArea machine involving XXE, Hoverfly RCE, and Bash hijacking."
 ### **Step By Step**
 
