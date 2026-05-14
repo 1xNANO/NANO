@@ -234,7 +234,7 @@ CTRL Z
   stty raw -echo;fg  click enter  export TERM=xterm   
   ```
 
-### **7\. Privilege Escalation**
+ 7.**Privilege Escalation**
 =================================
 
 After securing a foothold as **dev\_ryan**, I began my internal enumeration. Checking sudo permissions revealed an interesting entry:
