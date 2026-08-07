@@ -1,0 +1,99 @@
+---
+import { getCollection } from 'astro:content';
+import MainGridLayout from '@/layouts/MainGridLayout.astro';
+import { url } from '@/utils/url-utils';
+
+export async function getStaticPaths() {
+    const allPosts = await getCollection('posts', ({ data }) => {
+        return import.meta.env.PROD ? !data.draft : true;
+    });
+
+    const categoryMap = new Map<string, any[]>();
+
+    allPosts.forEach((post) => {
+        let cat = post.data.category || post.data.categories;
+
+        if (Array.isArray(cat)) {
+            cat = cat[0];
+        }
+
+        if (!cat || typeof cat !== 'string' || cat.trim() === '') {
+            cat = 'Uncategorized';
+        } else {
+            cat = cat.trim();
+        }
+
+        if (!categoryMap.has(cat)) {
+            categoryMap.set(cat, []);
+        }
+        categoryMap.get(cat)?.push(post);
+    });
+
+    return Array.from(categoryMap.entries()).map(([catName, postsList]) => {
+        return {
+            params: { category: catName },
+            props: { 
+                categoryName: catName, 
+                categoryPosts: postsList || [] 
+            },
+        };
+    });
+}
+
+const { categoryName, categoryPosts = [] } = Astro.props;
+
+const sortedPosts = [...categoryPosts].sort((a, b) => {
+    const dateA = new Date(a.data.published || a.data.date || a.data.pubDate || 0).getTime();
+    const dateB = new Date(b.data.published || b.data.date || b.data.pubDate || 0).getTime();
+    return dateB - dateA;
+});
+
+function formatDate(dateVal: any) {
+    if (!dateVal) return '';
+    const d = new Date(dateVal);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+    });
+}
+---
+
+<MainGridLayout title={`Category: ${categoryName}`}>
+    <div class="card-base p-6 md:p-8">
+        <div class="flex items-baseline gap-3 mb-8 pb-4 border-b border-black/10 dark:border-white/10">
+            <h1 class="text-3xl font-bold text-black/90 dark:text-white/90">
+                {categoryName}
+            </h1>
+            <span class="text-2xl font-bold text-[var(--primary)] font-mono">
+                {sortedPosts.length}
+            </span>
+        </div>
+
+        {sortedPosts.length === 0 ? (
+            <p class="text-center text-black/50 dark:text-white/50 py-8">No posts found in this category.</p>
+        ) : (
+            <div class="flex flex-col gap-4">
+                {sortedPosts.map((post) => {
+                    // تنظيف الـ slug من امتداد .md أو .mdx
+                    const cleanSlug = (post.slug || post.id).replace(/\.(md|mdx)$/, '');
+                    
+                    return (
+                        <a
+                            href={url(`/posts/${cleanSlug}/`)}
+                            class="group flex flex-col md:flex-row md:items-center justify-between py-3 border-b border-black/5 dark:border-white/5 last:border-0 hover:pl-2 transition-all duration-200"
+                        >
+                            <span class="font-medium text-lg text-black/80 dark:text-white/80 group-hover:text-[var(--primary)] transition-colors">
+                                {post.data.title}
+                            </span>
+                            <span class="text-sm font-mono text-black/40 dark:text-white/40 group-hover:text-black/60 dark:group-hover:text-white/60 transition-colors shrink-0">
+                                {formatDate(post.data.published || post.data.date || post.data.pubDate)}
+                            </span>
+                        </a>
+                    );
+                })}
+            </div>
+        )}
+    </div>
+</MainGridLayout>

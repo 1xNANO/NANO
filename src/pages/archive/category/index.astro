@@ -1,0 +1,69 @@
+---
+import { getCollection } from 'astro:content';
+import MainGridLayout from '@/layouts/MainGridLayout.astro';
+import { url } from '@/utils/url-utils';
+import { Icon } from 'astro-icon/components';
+
+
+const posts = await getCollection('posts', ({ data }) => {
+    return import.meta.env.PROD ? !data.draft : true;
+});
+
+
+const categoryMap = new Map<string, number>();
+
+posts.forEach((post) => {
+    let cat = post.data.category || post.data.categories;
+    
+  
+    if (Array.isArray(cat)) {
+        cat = cat[0];
+    }
+
+    if (!cat || typeof cat !== 'string' || cat.trim() === '') {
+        cat = 'Uncategorized';
+    } else {
+        cat = cat.trim();
+    }
+
+    categoryMap.set(cat, (categoryMap.get(cat) || 0) + 1);
+});
+
+const categories = Array.from(categoryMap.entries())
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+---
+
+<MainGridLayout title="Categories">
+    <div class="card-base p-6 md:p-8">
+       
+        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-black/10 dark:border-white/10">
+            <Icon name="material-symbols:folder-open-outline-rounded" class="text-3xl text-[var(--primary)]" />
+            <h1 class="text-2xl font-bold text-black/90 dark:text-white/90">Categories</h1>
+        </div>
+
+        {categories.length === 0 ? (
+            <p class="text-center text-black/50 dark:text-white/50 py-8">No categories found.</p>
+        ) : (
+            
+            <div class="flex flex-col gap-1">
+                {categories.map((item) => (
+                    <a
+                        href={url(`/archive/category/${item.name}/`)}
+                        class="group flex items-center justify-between py-3 px-4 rounded-lg hover:bg-[var(--primary)]/10 hover:pl-6 transition-all duration-200"
+                    >
+                        <div class="flex items-center gap-3">
+                            <span class="w-2 h-2 rounded-full bg-[var(--primary)] group-hover:scale-125 transition-transform"></span>
+                            <span class="font-medium text-lg text-black/80 dark:text-white/80 group-hover:text-[var(--primary)] group-hover:font-semibold transition-colors">
+                                {item.name}
+                            </span>
+                        </div>
+                        <span class="text-sm text-black/50 dark:text-white/50 group-hover:text-[var(--primary)] font-mono transition-colors">
+                            {item.count} {item.count === 1 ? 'post' : 'posts'}
+                        </span>
+                    </a>
+                ))}
+            </div>
+        )}
+    </div>
+</MainGridLayout>
