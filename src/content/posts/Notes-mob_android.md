@@ -2,13 +2,13 @@
 title: Android Pentesting Workflow
 published: 2025-12-16
 description: "⭐ NANO IS HERE ⭐"
-image: "./mob.jpg"
+image: "./mob.png"
 tags: ["Android", "Mobile Pentesting", "Frida", "Security"]
 category: Android Security
 draft: false
 ---
 
-> [Source](./mob.jpg)
+> [Source](./mob.png)
 
 ⭐ **NANO IS HERE** ⭐  
 --------------------
