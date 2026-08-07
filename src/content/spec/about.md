@@ -1,6 +1,6 @@
 # About
 
-::github{repo="NANObyte0/NANObyte0"}
+::github{repo="1xNAN0"}
 
 > ### ⭐ NANO IS HERE ⭐
 
