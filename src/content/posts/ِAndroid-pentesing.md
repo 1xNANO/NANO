@@ -39,7 +39,7 @@ After getting a feel for how the app behaves we jump into reverse engineering to
 1. **Static Analysis:**
 ===
 
-> Cover image source: [Source](./pen1.png)
+![Penetration Testing Step 1](./pen1.png)
 This app 
 we will testing all and get the flags
 
@@ -48,11 +48,11 @@ Once the application is installed and running on the device we open **JADX** to 
  This allows us to inspect the core logic inspect key classes and map out the internal structure of the app before diving deeper into specific components.
 
 
- > Cover image source: [Source](./FlagOne.png)
+ ![Penetration Testing Step 1](./FlagOne.png)
 
 2. **Flag One - Hardcoded CREd**:
 ===
- > Cover image source: [Source](./FlagOne-2.png)
+ ![Penetration Testing Step 1](./FlagOne-2.png)
 
 First we inspect the `AndroidManifest.xml` file to locate the target **activities** We find FlagOneLoginActivity registered in the manifest.
 
@@ -79,7 +79,7 @@ Invoke exported activity with **adb**
 
 Checking **AndroidManifest.xml** reveals the activity definition for **b3nac.injuredandroid.b25lActivity**
 
-> Cover image source: [Source](./FlagTwo-1.png)
+ ![Penetration Testing Step 1](./FlagTwo-1.png)
 ```
 <activity
     android:name="b3nac.injuredandroid.b25lActivity"
@@ -91,7 +91,7 @@ The attribute android:``exported="true"`` means any external application or comm
 **We can bypass the UI and trigger the flag directly using adb**
 ```adb shell am start -n b3nac.injuredandroid/.b25lActivity```
 
- Cover image source: [Source](./FlagTwo-2.png)
+![Penetration Testing Step 1](./FlagTwo-2.png)
 
 4. **Flag Three 3: Resource Reference Trace**
 ===
@@ -99,7 +99,7 @@ The attribute android:``exported="true"`` means any external application or comm
 
 Find FlagThreeActivity `b3nac.injuredandroid.FlagThreeActivity` in AndroidManifest.xml and following the activity 
 
- Cover image source: [Source](./FlagThree-1.png)
+ ![Penetration Testing Step 1](./FlagThree-1.png)
 
 Inspecting `FlagThreeActivity` in JADX reveals how input validation is executed:
 ```
@@ -117,7 +117,7 @@ To resolve this reference, we navigate to **res/values/strings.xml** inside JADX
 ```
 <string name="cmVzb3VyY2VzX3lv">F1ag_thr33</string>
 ```
- Cover image source: [Source](./FlagThree-2.png)
+ ![Penetration Testing Step 1](./FlagThree-2.png)
 
 
 5. **Flag Four 4: Base64 Obfuscation**
@@ -315,7 +315,7 @@ sqlite> select * from Thisisatest
 1|The flag hash!|2ab96390c7dbe3439de74d0c9b0b1767
 2|The flag is also a password!|9EEADi^^:?;FC652?5C@:5]7:C632D6:@]4@>^DB=:E6];D@?
 ```
- Cover image source: [Source](./sqlite3.png)
+ ![Penetration Testing Step 1](./sqlite3.png)
 
 
 Cracking the MD5 Password Hash
@@ -399,10 +399,10 @@ Inspecting AndroidManifest.xml identifies two separate activities configured for
 ```
 The defanged Firebase URL is:
 
- Cover image source: [Source](./base.png)
+ ![Penetration Testing Step 1](./base.png)
 
 https://injuredandroid.firebaseio.com/aws.json
- Cover image source: [Source](./base8.png)
+ ![Penetration Testing Step 1](./base8.png)
 
 
 Lets to see **strings.xml**
@@ -464,7 +464,7 @@ target URL: [``https://injuredandroid.firebaseio.com/flags.json``]
 
 
 open the web browser:
- Cover image source: [Source](./nine.png)
+ ![Penetration Testing Step 1](./nine.png)
 We get the flag yah shapap so encode the this ``[nine!_flag]`` to base64 with `[]` okay :) 
 so Here we go the base64 ->> xd:) `W25pbmUhX2ZsYWdd`
 
@@ -507,8 +507,7 @@ Start the target authentication activity using adb
 ```
 adb shell am start -n b3nac.injuredandroid/.QXV0aA
 ```
-
- Cover image source: [Source](./ten.png)
+ ![Penetration Testing Step 1](./ten.png)
 
 Paste the email containing the dotless ı:
 ```
@@ -546,7 +545,7 @@ apktool d injuredandroid.apk
 Executing / Inspecting the Native Binary
 
 Inside the unpacked directory structure, the compiled Go executable (me'nu)  `res/values/meŉuis` located within the raw app assets. Running the binary directly or extracting plain-text strings yields the final key:
- Cover image source: [Source](./flag_11.png)
+  ![Penetration Testing Step 1](./flag_11.png)
  based on Firebase:
 ```
 HIIMASTRING

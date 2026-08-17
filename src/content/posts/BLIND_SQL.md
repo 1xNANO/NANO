@@ -66,8 +66,8 @@ To confirm if the `users` table exists, we leverage the `information_schema.tabl
 admin' AND (SELECT 'z' FROM information_schema.tables WHERE table_name='users')='z
 ```
 
-*   If the response is: **“A password reset email has been sent.”** → ✅ Table exists.
-*   If the response is: **“Invalid username.”** → ❌ Table does not exist.
+*   If the response is: **“A password reset email has been sent.”** →  Table exists.
+*   If the response is: **“Invalid username.”** →  Table does not exist.
 
 This confirms that the table `users` is present.
 
@@ -121,7 +121,7 @@ print("[+] Extracted password:", password)
 
 This script automates the blind extraction process.
 
-🛡️ Recommendations
+ Recommendations
 -------------------
 
 *   Always sanitize user input using **prepared statements / parameterized queries**
